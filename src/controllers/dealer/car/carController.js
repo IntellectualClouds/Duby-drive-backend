@@ -14,7 +14,6 @@ const createCar = async (req, res) => {
     const existingCar = await prisma.car.findUnique({
       where: { licensePlate: data.licensePlate },
     });
-    console.log(existingCar);
     if (existingCar) {
       return res
         .status(400)

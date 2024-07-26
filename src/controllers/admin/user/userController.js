@@ -53,8 +53,11 @@ const getUser = async (req, res) => {
   try {
     const user = await prisma.user.findUnique({
       where: { id: parseInt(id, 10) },
+      include: {
+        cars: true,
+        yachts: true,
+      },
     });
-
     if (user) {
       res.json(user);
     } else {
@@ -105,30 +108,11 @@ const getUsers = async (req, res) => {
   }
 };
 
-const getUserByRole = async (req, res) => {
-  const { id } = req.params;
-
-  try {
-    const user = await prisma.user.findUnique({
-      where: { id: parseInt(id, 10) },
-      include: { role: true }, // Include related role data
-    });
-
-    if (user) {
-      res.json(user);
-    } else {
-      res.status(404).json({ error: "User not found" });
-    }
-  } catch (error) {
-    res.status(500).json({ error: "Could not retrieve user", details: error });
-  }
-};
 
 module.exports = {
   createUser,
   getUser,
   updateUser,
   deleteUser,
-  getUserByRole,
   getUsers,
 };

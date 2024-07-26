@@ -17,7 +17,8 @@ model User {
   role           Role     @relation(fields: [roleId], references: [id])
   roleId         Int
   active         String   @default("true")
-  cars           Car[]    // Assuming a user can have multiple cars
+  cars           Car[]
+  yachts         Yacht[] 
   createdAt      DateTime @default(now())
 }
 
@@ -120,3 +121,63 @@ model Feature {
   cars  Car[]  @relation("CarFeatures")
 }
 
+
+
+model YachtType {
+  id    Int     @id @default(autoincrement())
+  name  String  @unique
+  yachts Yacht[]
+}
+
+model Location {
+  id    Int     @id @default(autoincrement())
+  name  String  @unique
+  yachts Yacht[]
+}
+
+model Yacht {
+  id               Int     @id @default(autoincrement())
+  name             String
+  capacity         String
+  size             String
+  yachtType        YachtType @relation(fields: [yachtTypeId], references: [id])
+  yachtTypeId      Int
+  dealer           User     @relation(fields: [dealerId], references: [id])
+  dealerId         Int
+  captain          Boolean
+  crew             Boolean
+  location         Location @relation(fields: [locationId], references: [id])
+  locationId       Int
+  rooms            String
+  overview         String
+  active           Boolean  @default(true)
+  ice              Boolean
+  water            Boolean
+  softDrinks       Boolean
+  freeFuel         Boolean
+  towel            Boolean
+  bbqEquipment     Boolean
+  kidsWelcome      Boolean
+  musicSystem      Boolean
+  freeRefreshment  Boolean
+  fishingEquipment Boolean
+  safetyEquipment  Boolean
+  bluetooth        Boolean
+  usbPort          Boolean
+  aux              Boolean
+  shower           Boolean
+  pillowsBlanket   Boolean
+  cooler           Boolean
+  airConditioner   Boolean
+  microwave        Boolean
+  insideSpeaker    Boolean
+  outsideSpeaker   Boolean
+  audioSystem      Boolean
+  hourCost         String
+  dayCost          String
+  weekCost         String
+  meta             String?
+  metaKeywords     String[]
+  images           String[]
+  video            String?
+}

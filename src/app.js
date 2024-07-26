@@ -15,6 +15,9 @@ const featuresRoutes = require("./routes/admin/carFeatures/carFeaturesRoutes");
 const carTyperoutes = require("./routes/admin/carType/carTyperoutes");
 const authRoutes = require("./routes/auth/auth");
 
+const yachtTypeRoutes = require("./routes/admin/yachtType/yachtTypeRoutes");
+const locationRoutes = require("./routes/admin/location/locationRoutes");
+const yachtRoutes = require("./routes/dealer/yacht/yachtRoutes");
 // Initialize express app
 const app = express();
 const port = process.env.PORT || 3000;
@@ -48,6 +51,12 @@ app.use("/api/insurance-type", insuranceRoutes);
 app.use("/api/fuel-type", fuelRoutes);
 app.use("/api/car-feature", featuresRoutes);
 app.use("/api/car-type", carTyperoutes);
+
+// yacht routes
+app.use("/api/yacht-type", yachtTypeRoutes);
+app.use("/api/location", locationRoutes);
+app.use("/api/yachts", yachtRoutes);
+
 
 // Start server
 app.listen(port, () => {

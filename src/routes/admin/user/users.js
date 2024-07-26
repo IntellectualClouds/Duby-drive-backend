@@ -1,11 +1,9 @@
-// src/routes/users.js
 const express = require("express");
 const router = express.Router();
 const {
   createUser,
   updateUser,
   deleteUser,
-  getUserByRole,
   getUser,
   getUsers,
 } = require("../../../controllers/admin/user/userController");
@@ -20,7 +18,6 @@ router.post(
   createUser
 );
 router.put("/:id", verifyToken, upload.single("profilePicture"), updateUser);
-router.get("/:id", verifyToken, getUserByRole);
 router.get("/:id", verifyToken, getUser);
 router.get("/", verifyToken, verifyRole("Super Admin"), getUsers);
 router.delete("/:id", verifyToken, verifyRole("Super Admin"), deleteUser);
