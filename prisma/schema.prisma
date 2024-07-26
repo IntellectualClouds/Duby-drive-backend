@@ -181,3 +181,27 @@ model Yacht {
   images           String[]
   video            String?
 }
+
+
+model Package {
+  id             Int      @id @default(autoincrement())
+  name           String
+  duration       String
+  logo           String   
+  sellPrice      String
+  offerPrice     String
+  currency       Currency @relation(fields: [currencyId], references: [id])
+  currencyId     Int
+  carsLimit      Int
+  description    String
+  verify         Boolean  @default(false)
+  featured       Boolean  @default(false)
+  premium        Boolean  @default(false)
+  active         Boolean  @default(true) 
+}
+
+model Currency {
+  id       Int      @id @default(autoincrement())  
+  name     String  @unique
+  packages Package[]
+}

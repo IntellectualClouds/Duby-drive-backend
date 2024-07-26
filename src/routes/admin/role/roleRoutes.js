@@ -6,15 +6,13 @@ const { verifyToken, verifyRole } = require("../../../middleware/auth");
 
 router.post(
   "/",
-  // verifyToken,
-  // verifyRole("Super Admin"),
+  verifyToken,
+  verifyRole("Super Admin"),
   roleController.createRole
 );
 router.get("/:id", roleController.getRole);
 router.get(
   "/",
-  // verifyToken,
-  // verifyRole("Super Admin"),
   roleController.getRoles
 );
 router.put(
@@ -25,8 +23,8 @@ router.put(
 );
 router.delete(
   "/:id",
-  // verifyToken,
-  // verifyRole("Super Admin"),
+  verifyToken,
+  verifyRole("Super Admin"),
   roleController.deleteRole
 );
 

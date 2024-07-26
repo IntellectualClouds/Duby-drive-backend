@@ -1,7 +1,7 @@
 const express = require("express");
 const bodyParser = require("body-parser");
-const { Client } = require('pg');
-require('dotenv').config();
+const { Client } = require("pg");
+require("dotenv").config();
 
 // Import routes
 const userRoutes = require("./routes/admin/user/users");
@@ -18,6 +18,8 @@ const authRoutes = require("./routes/auth/auth");
 const yachtTypeRoutes = require("./routes/admin/yachtType/yachtTypeRoutes");
 const locationRoutes = require("./routes/admin/location/locationRoutes");
 const yachtRoutes = require("./routes/dealer/yacht/yachtRoutes");
+const packageRoutes = require("./routes/admin/package/packageRoutes");
+const currencyRoutes = require("./routes/admin/currency/currencyRoutes");
 // Initialize express app
 const app = express();
 const port = process.env.PORT || 3000;
@@ -30,10 +32,11 @@ const client = new Client({
   },
 });
 
-client.connect()
-  .then(() => console.log('Connected to the database'))
-  .catch(err => {
-    console.error('Connection error', err.stack);
+client
+  .connect()
+  .then(() => console.log("Connected to the database"))
+  .catch((err) => {
+    console.error("Connection error", err.stack);
     process.exit(1); // Exit process if database connection fails
   });
 
@@ -56,10 +59,10 @@ app.use("/api/car-type", carTyperoutes);
 app.use("/api/yacht-type", yachtTypeRoutes);
 app.use("/api/location", locationRoutes);
 app.use("/api/yachts", yachtRoutes);
-
+app.use("/api/package", packageRoutes);
+app.use("/api/currency", currencyRoutes);
 
 // Start server
 app.listen(port, () => {
   console.log(`Server running at http://localhost:${port}`);
 });
-  
