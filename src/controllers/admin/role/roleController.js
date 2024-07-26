@@ -1,61 +1,53 @@
-// controllers/roleController.js
-const { docClient } = require("../../../config/dynamodb");
-const { v4: uuidv4 } = require("uuid");
+const { PrismaClient } = require("@prisma/client");
 
-const tableName = "Roles";
+const prisma = new PrismaClient();
 
 const createRole = async (req, res) => {
   const { roleName } = req.body;
 
-  const role = {
-    roleId: uuidv4(),
-    roleName,
-    createdAt: new Date().toISOString(),
-  };
-
-  const params = {
-    TableName: tableName,
-    Item: role,
-  };
-
   try {
-    await docClient.put(params).promise();
-    res.status(201).json({ message: "Role created successfully" });
+    // Check if the role with the same name already exists
+    const existingRole = await prisma.role.findUnique({
+      where: { name: roleName },
+    });
+
+    if (existingRole) {
+      return res.status(400).json({ error: "Role already exists" });
+    }
+
+    // Create the new role
+    const role = await prisma.role.create({
+      data: {
+        name: roleName,
+      },
+    });
+
+    res.status(201).json({ message: "Role created successfully", role });
   } catch (error) {
     res.status(500).json({ error: "Could not create role", details: error });
   }
 };
 
+
 const getRoles = async (req, res) => {
-
-  const params = {
-    TableName: tableName,
-  };
-
   try {
-    const data = await docClient.scan(params).promise();
-    console.log(data)
-    if (data.Items) {
-      res.json(data.Items);
-    } else {
-      res.status(404).json({ error: "Role not found" });
-    }
+    const roles = await prisma.role.findMany();
+    res.json(roles);
   } catch (error) {
-    res.status(500).json({ error: "Could not retrieve role", details: error });
+    res.status(500).json({ error: "Could not retrieve roles", details: error });
   }
 };
-const getRole = async (req, res) => {
-  const { roleId } = req.params;
 
-  const params = {
-    TableName: tableName,
-    Key: { roleId },
-  };
+const getRole = async (req, res) => {
+  const { id } = req.params;
 
   try {
-    const data = await docClient.get(params).promise();
-    if (data.Item) {
-      res.json(data.Item);
+    const role = await prisma.role.findUnique({
+      where: { id: parseInt(id, 10) },
+    });
+
+    if (role) {
+      res.json(role);
     } else {
       res.status(404).json({ error: "Role not found" });
     }
@@ -65,38 +57,31 @@ const getRole = async (req, res) => {
 };
 
 const updateRole = async (req, res) => {
-  const { roleId } = req.params;
+  const { id } = req.params;
   const updateData = req.body;
 
-  const params = {
-    TableName: tableName,
-    Key: { roleId },
-    UpdateExpression: "set roleName = :roleName, permissions = :permissions",
-    ExpressionAttributeValues: {
-      ":roleName": updateData.roleName,
-      ":permissions": updateData.permissions,
-    },
-    ReturnValues: "UPDATED_NEW",
-  };
-
   try {
-    const data = await docClient.update(params).promise();
-    res.json(data.Attributes);
+    const role = await prisma.role.update({
+      where: { id: parseInt(id, 10) },
+      data: {
+        name: updateData.roleName,
+        permissions: updateData.permissions,
+      },
+    });
+
+    res.json(role);
   } catch (error) {
     res.status(500).json({ error: "Could not update role", details: error });
   }
 };
 
 const deleteRole = async (req, res) => {
-  const { roleId } = req.params;
-
-  const params = {
-    TableName: tableName,
-    Key: { roleId },
-  };
-
+  const { id } = req.params;
   try {
-    await docClient.delete(params).promise();
+    await prisma.role.delete({
+      where: { id },
+    });
+
     res.json({ message: "Role deleted successfully" });
   } catch (error) {
     res.status(500).json({ error: "Could not delete role", details: error });
@@ -108,5 +93,5 @@ module.exports = {
   getRole,
   updateRole,
   deleteRole,
-  getRoles
+  getRoles,
 };

@@ -1,0 +1,122 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id             Int      @id @default(autoincrement())
+  fullname       String   @default("Dummy Name")
+  email          String   @unique
+  password       String
+  profilePicture String?
+  phoneNumber    String
+  role           Role     @relation(fields: [roleId], references: [id])
+  roleId         Int
+  active         String   @default("true")
+  cars           Car[]    // Assuming a user can have multiple cars
+  createdAt      DateTime @default(now())
+}
+
+
+model Role {
+  id    Int    @id @default(autoincrement())
+  name  String @unique
+  users User[]
+}
+
+model Banner {
+  id          Int      @id @default(autoincrement())
+  page        String
+  bannerNumber Int
+  active      String  @default("true")
+  html        String
+  createdAt   DateTime @default(now())
+}
+
+
+model CarBrand {
+  id             Int    @id @default(autoincrement())
+  brandName      String @unique
+  brandLogo      String?
+  description    String?
+  activeStatus   String    @default("true")
+  descriptionStatus String @default("true")
+  cars           Car[]
+}
+
+model CarType {
+  id   Int    @id @default(autoincrement())
+  name String @unique
+  cars Car[] 
+}
+
+model FuelType {
+  id   Int    @id @default(autoincrement())
+  name String @unique
+  cars Car[] 
+}
+
+model InsuranceType {
+  id   Int    @id @default(autoincrement())
+  name String @unique
+  cars Car[]
+}
+
+model Car {
+  id                        Int           @id @default(autoincrement())
+  modelNo                   String        
+  licensePlate              String        @unique
+  brand                     CarBrand      @relation(fields: [brandId], references: [id])
+  brandId                   Int
+  type                      CarType       @relation(fields: [typeId], references: [id])
+  typeId                    Int
+  features                  Feature[]     @relation("CarFeatures")
+  dealerId                  Int
+  active                    String        @default("true")
+  description               String?
+  doors                     Int
+  rentalDays                Int
+  seats                     Int
+  luggage                   String
+  fuelType                  FuelType      @relation(fields: [fuelTypeId], references: [id])
+  fuelTypeId                Int
+  gssType                   String
+  autoTransmission          String
+  additionalMileageCharges  String?
+  salikTollCharges          String?
+  additionalDriverInsurance String
+  insuranceType             InsuranceType @relation(fields: [insuranceTypeId], references: [id])
+  insuranceTypeId           Int
+  interiorColor             String?
+  exteriorColor             String?
+  dayBasisMileageLimit      Int
+  dayBasisCost              Float
+  weeklyMileageLimit        Int
+  weeklyCost                Float
+  monthlyMileageLimit       Int
+  monthlyCost               Float
+  discountOfferPercentage   String
+  discountOfferDate         String
+  securityDeposit           String?
+  selectRefund              Int?
+  driverAge                 Int?
+  seoMeta                   String?
+  metaKeywords              String[]
+  featureImage              String
+  carImages                 String[]
+  carVideo                  String?
+  owner                     User          @relation(fields: [ownerId], references: [id])
+  ownerId                   Int
+}
+
+
+model Feature {
+  id    Int    @id @default(autoincrement())
+  name  String @unique
+  cars  Car[]  @relation("CarFeatures")
+}
+

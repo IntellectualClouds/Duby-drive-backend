@@ -10,12 +10,19 @@ const {
   getUsers,
 } = require("../../../controllers/admin/user/userController");
 const upload = require("../../../middleware/upload");
+const { verifyToken, verifyRole } = require("../../../middleware/auth");
 
-router.post("/", upload.single("profilePicture"), createUser);
-router.put("/:id", upload.single("profilePicture"), updateUser);
-router.get("/:id", getUserByRole);
-router.get("/:id", getUser);
-router.get("/", getUsers);
-router.delete("/:id", deleteUser);
+router.post(
+  "/",
+  verifyToken,
+  verifyRole("Super Admin"),
+  upload.single("profilePicture"),
+  createUser
+);
+router.put("/:id", verifyToken, upload.single("profilePicture"), updateUser);
+router.get("/:id", verifyToken, getUserByRole);
+router.get("/:id", verifyToken, getUser);
+router.get("/", verifyToken, verifyRole("Super Admin"), getUsers);
+router.delete("/:id", verifyToken, verifyRole("Super Admin"), deleteUser);
 
 module.exports = router;

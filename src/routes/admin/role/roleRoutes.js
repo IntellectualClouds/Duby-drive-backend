@@ -2,11 +2,32 @@
 const express = require("express");
 const router = express.Router();
 const roleController = require("../../../controllers/admin/role/roleController");
+const { verifyToken, verifyRole } = require("../../../middleware/auth");
 
-router.post("/", roleController.createRole);
-router.get("/:roleId", roleController.getRole);
-router.get("/", roleController.getRoles);
-router.put("/:roleId", roleController.updateRole);
-router.delete("/:roleId", roleController.deleteRole);
+router.post(
+  "/",
+  // verifyToken,
+  // verifyRole("Super Admin"),
+  roleController.createRole
+);
+router.get("/:id", roleController.getRole);
+router.get(
+  "/",
+  // verifyToken,
+  // verifyRole("Super Admin"),
+  roleController.getRoles
+);
+router.put(
+  "/:id",
+  verifyToken,
+  verifyRole("Super Admin"),
+  roleController.updateRole
+);
+router.delete(
+  "/:id",
+  // verifyToken,
+  // verifyRole("Super Admin"),
+  roleController.deleteRole
+);
 
 module.exports = router;

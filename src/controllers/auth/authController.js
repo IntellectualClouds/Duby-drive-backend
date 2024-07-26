@@ -1,48 +1,45 @@
-// src/controllers/userController.js
-
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const { docClient } = require("../../config/dynamodb");
+const { PrismaClient } = require("@prisma/client");
+
+const prisma = new PrismaClient();
 
 // Login a user
-const tableName = "Users";
 const login = async (req, res) => {
   const { email, password } = req.body;
 
-  const params = {
-    TableName: tableName,
-    IndexName: "EmailIndex", // Ensure this matches your GSI name
-    KeyConditionExpression: "email = :email",
-    ExpressionAttributeValues: {
-      ":email": email,
-    },
-  };
-
   try {
-    const data = await docClient.query(params).promise();
+    // Fetch user and role from the database
+    const user = await prisma.user.findUnique({
+      where: { email },
+      include: { role: true }, // Include the role relationship
+    });
 
-    if (data.Items.length === 0) {
+    if (!user) {
       return res.status(400).json({ error: "Invalid email or password" });
     }
 
-    const user = data.Items[0];
-
+    // Check if the provided password matches the stored hashed password
     const isPasswordValid = await bcrypt.compare(password, user.password);
 
     if (!isPasswordValid) {
       return res.status(400).json({ error: "Invalid email or password" });
     }
 
+    // Generate JWT token
     const token = jwt.sign(
-      { userId: user.userId, email: user.email, role: user.role },
-      process.env.JWT_SECRET
+      { id: user.id, email: user.email, role: user.role.name },
+      process.env.TOKEN_SECRET
     );
+
+    // Respond with user info and token
     const result = {
       email: user.email,
-      role: user.role,
+      role: user.role.name,
       profilePicture: user.profilePicture,
       token,
     };
+
     res.status(200).json({ result });
   } catch (error) {
     console.error("Error logging in:", error);

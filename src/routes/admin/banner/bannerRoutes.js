@@ -6,10 +6,11 @@ const {
   deleteBanner,
   getBanner,
 } = require("../../../controllers/admin/banner/bannerController");
+const { verifyRole, verifyToken } = require("../../../middleware/auth");
 
-router.post("/", createBanner);
+router.post("/", verifyToken, verifyRole("Super Admin"), createBanner);
 router.get("/", getBanners);
-router.delete("/:id", deleteBanner);
+router.delete("/:id", verifyToken, verifyRole("Super Admin"), deleteBanner);
 router.get("/:id", getBanner);
 
 module.exports = router;
