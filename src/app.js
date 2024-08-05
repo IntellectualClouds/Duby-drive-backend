@@ -20,6 +20,9 @@ const locationRoutes = require("./routes/admin/location/locationRoutes");
 const yachtRoutes = require("./routes/dealer/yacht/yachtRoutes");
 const packageRoutes = require("./routes/admin/package/packageRoutes");
 const currencyRoutes = require("./routes/admin/currency/currencyRoutes");
+const citiesRoutes = require("./routes/admin/cities/citiesRoutes");
+const cityAreaRoutes = require("./routes/admin/cityArea/cityAreaRoutes");
+const dealerRoutes = require("./routes/admin/dealer/dealerRoutes");
 // Initialize express app
 const app = express();
 const port = process.env.PORT || 3000;
@@ -61,6 +64,9 @@ app.use("/api/location", locationRoutes);
 app.use("/api/yachts", yachtRoutes);
 app.use("/api/package", packageRoutes);
 app.use("/api/currency", currencyRoutes);
+app.use("/api/cities", citiesRoutes);
+app.use("/api/city-area", cityAreaRoutes);
+app.use("/api/dealer", dealerRoutes);
 
 // Start server
 app.listen(port, () => {
