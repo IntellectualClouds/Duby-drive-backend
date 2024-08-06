@@ -8,20 +8,19 @@ generator client {
 }
 
 model User {
-  id             Int      @id @default(autoincrement())
-  fullname       String   @default("Dummy Name")
-  email          String   @unique
+  id             Int          @id @default(autoincrement())
+  fullname       String       @default("Dummy Name")
+  email          String       @unique
   password       String
   profilePicture String?
   phoneNumber    String
-  role           Role     @relation(fields: [roleId], references: [id])
+  role           Role         @relation(fields: [roleId], references: [id])
   roleId         Int
-  active         String   @default("true")
-  cars           Car[]
-  yachts         Yacht[] 
-  createdAt      DateTime @default(now())
+  active         String       @default("true")
+  dealer         Dealer?      
+  impressions    Impression[] 
+  createdAt      DateTime     @default(now())
 }
-
 
 model Role {
   id    Int    @id @default(autoincrement())
@@ -29,15 +28,16 @@ model Role {
   users User[]
 }
 
-model Banner {
-  id          Int      @id @default(autoincrement())
-  page        String
-  bannerNumber Int
-  active      String  @default("true")
-  html        String
-  createdAt   DateTime @default(now())
+model Impression {
+  id        Int      @id @default(autoincrement())
+  user      User     @relation(fields: [userId], references: [id])
+  userId    Int
+  car       Car?     @relation(fields: [carId], references: [id])
+  carId     Int?
+  yacht     Yacht?   @relation(fields: [yachtId], references: [id])
+  yachtId   Int?
+  createdAt DateTime @default(now())
 }
-
 
 model CarBrand {
   id             Int    @id @default(autoincrement())
@@ -76,7 +76,6 @@ model Car {
   type                      CarType       @relation(fields: [typeId], references: [id])
   typeId                    Int
   features                  Feature[]     @relation("CarFeatures")
-  dealerId                  Int
   active                    String        @default("true")
   description               String?
   doors                     Int
@@ -110,18 +109,16 @@ model Car {
   featureImage              String
   carImages                 String[]
   carVideo                  String?
-  owner                     User          @relation(fields: [ownerId], references: [id])
-  ownerId                   Int
+  dealer                    Dealer        @relation(fields: [dealerId], references: [id])
+  dealerId                  Int
+  impressions               Impression[]  // Track impressions for this car
 }
-
 
 model Feature {
   id    Int    @id @default(autoincrement())
   name  String @unique
   cars  Car[]  @relation("CarFeatures")
 }
-
-
 
 model YachtType {
   id    Int     @id @default(autoincrement())
@@ -142,7 +139,7 @@ model Yacht {
   size             String
   yachtType        YachtType @relation(fields: [yachtTypeId], references: [id])
   yachtTypeId      Int
-  dealer           User     @relation(fields: [dealerId], references: [id])
+  dealer           Dealer    @relation(fields: [dealerId], references: [id])
   dealerId         Int
   captain          Boolean
   crew             Boolean
@@ -180,8 +177,8 @@ model Yacht {
   metaKeywords     String[]
   images           String[]
   video            String?
+  impressions      Impression[] // Track impressions for this yacht
 }
-
 
 model Package {
   id             Int      @id @default(autoincrement())
@@ -194,14 +191,77 @@ model Package {
   currencyId     Int
   carsLimit      Int
   description    String
-  verify         Boolean  @default(false)
-  featured       Boolean  @default(false)
-  premium        Boolean  @default(false)
-  active         Boolean  @default(true) 
+  verify         Boolean   @default(false)
+  featured       Boolean   @default(false)
+  premium        Boolean   @default(false)
+  active         Boolean   @default(true) 
+  dealers        Dealer[]  
 }
 
 model Currency {
   id       Int      @id @default(autoincrement())  
   name     String  @unique
   packages Package[]
+}
+
+model City {
+  id       Int       @id @default(autoincrement())
+  name     String    @unique
+  image    String
+  active   Boolean   @default(true)
+  dealers  Dealer[]  
+  areas    CityArea[] 
+}
+
+model CityArea {
+  id        Int     @id @default(autoincrement())
+  name      String  @unique
+  latitude  String?
+  longitude String?
+  active    Boolean @default(true)
+  cityId    Int     
+  city      City    @relation(fields: [cityId], references: [id]) 
+  dealers   Dealer[] 
+}
+
+model Dealer {
+  id                   Int          @id @default(autoincrement())
+  name                 String       @unique
+  logo                 String?
+  contactNumber        String
+  whatsappNumber       String
+  nationality          String
+  packageId            Int
+  package              Package      @relation(fields: [packageId], references: [id])
+  startDate            DateTime?    @default(now())
+  dob                  String?
+  emiratesId           String?
+  licenseNumber        String?
+  vatNumber            String?
+  mapLink              String
+  cities               City[] 
+  deliveryAndPickup    String[]
+  languages            String[]
+  paymentMethods       String[]
+  fastDeliveryLocation CityArea[]
+  active               Boolean      @default(true)
+  description          String
+  address              String
+  facebookLink         String?
+  instagramLink        String?
+  twitterLink          String?
+  youtubeLink          String?
+  tiktokLink           String?
+  metaDescription      String?
+  metaKeywords         String[]
+  vatDocumentUrl       String
+  ejariDocumentUrl     String
+  insuranceDocumentUrl String
+  idCardUrl            String
+  createdAt            DateTime     @default(now())
+  updatedAt            DateTime     @updatedAt
+  user                 User     @relation(fields: [userId], references: [id])
+  userId               Int      @unique
+  cars                 Car[]
+  yachts               Yacht[]
 }
